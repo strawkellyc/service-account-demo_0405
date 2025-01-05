@@ -59,6 +59,14 @@ jobs:
         uses: docker/metadata-action@v4.4.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Sign Container Image
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+          COSIGN_TRUSTED_ROOT: "1"
+        run: |
+          cosign sign --yes ghcr.io/strawkellyc/service-account-demo_0405:main@sha256:a9e392e11e874d5832a915b3ee7d76a0a7afb6948f5dabcda3ab041ea6ad4a57
+
+
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
