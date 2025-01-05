@@ -59,12 +59,12 @@ jobs:
         uses: docker/metadata-action@v4.4.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Sign Container Image
-        env:
-          COSIGN_EXPERIMENTAL: "1"
-          COSIGN_TRUSTED_ROOT: "1"
-        run: |
-          cosign sign --yes ghcr.io/strawkellyc/service-account-demo_0405:main@sha256:a9e392e11e874d5832a915b3ee7d76a0a7afb6948f5dabcda3ab041ea6ad4a57
+      # - name: Sign Container Image
+      #   env:
+      #     COSIGN_EXPERIMENTAL: "1"
+      #     COSIGN_TRUSTED_ROOT: "1"
+      #   run: |
+      #     cosign sign --yes ghcr.io/strawkellyc/service-account-demo_0405:main@sha256:a9e392e11e874d5832a915b3ee7d76a0a7afb6948f5dabcda3ab041ea6ad4a57
 
 
 
@@ -73,6 +73,8 @@ jobs:
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@v4.0.0
+        
+        
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
@@ -90,7 +92,10 @@ jobs:
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
         env:
-          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_EXPERIMENTAL: 'true'
+          COSIGN_TRUSTED_ROOT: 'true'
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+        run: |
+          cosign sign --yes ghcr.io/strawkellyc/service-account-demo_0405:main@sha256:a9e392e11e874d5832a915b3ee7d76a0a7afb6948f5dabcda3ab041ea6ad4a57
+          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
