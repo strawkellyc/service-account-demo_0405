@@ -94,8 +94,8 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: 'true'
           COSIGN_TRUSTED_ROOT: 'true'
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
         run: |
-          cosign sign --yes ghcr.io/strawkellyc/service-account-demo_0405:main@sha256:a9e392e11e874d5832a915b3ee7d76a0a7afb6948f5dabcda3ab041ea6ad4a57
-          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+          echo "COSIGN_EXPERIMENTAL=${{ env.COSIGN_EXPERIMENTAL }}"
+          echo "COSIGN_TRUSTED_ROOT=${{ env.COSIGN_TRUSTED_ROOT }}"
+          cosign sign --yes --force ghcr.io/strawkellyc/service-account-demo_0405:main@sha256:a9e392e11e874d5832a915b3ee7d76a0a7afb6948f5dabcda3ab041ea6ad4a57
+          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --yes --force {}@${{ steps.build-and-push.outputs.digest }}
